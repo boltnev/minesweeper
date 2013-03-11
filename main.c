@@ -9,11 +9,13 @@
 #define MAX_Y     500
 #define MAX_MINES 20000
 
+//Place holds:
 enum{
   EMPTY,
   MINE
 };
 
+//Place states;
 enum{
   HIDDEN,
   VISIBLE,
@@ -112,6 +114,27 @@ void placeNumbers(Minefield *field){
     }
 }
 
+void openPlace(Minefield *field, int x, int y){
+    if(x < 0 || x >= field->xSize || y < 0 || y >= field->ySize)
+        return;
+    if(field->places[x][y].state != VISIBLE){
+       field->places[x][y].state = VISIBLE;
+       if(field->places[x][y].numberOfMinesNear == 0)
+            openNearbyPlaces(field, x, y);
+    }
+}
+
+void openNearbyPlaces(Minefield *field, int x, int y){
+    //x - 1, y - 1, 
+    //x - 1 y + 1, 
+    //x + 1, y - 1, 
+    //x + 1, y + 1
+    openPlace(field, x - 1, y); 
+    openPlace(field, x, y - 1); 
+    openPlace(field, x + 1, y ); 
+    openPlace(field, x, y + 1);
+}
+
 /* Simple controls, may be replaced by more advanced */
 int makeMove(Minefield *field){
     int x, y, action;
@@ -120,7 +143,7 @@ int makeMove(Minefield *field){
     
     if(x >= 0 && x < field->xSize && y >= 0 && y < field->ySize){
         if(action == 1)
-            field->places[x][y].state = VISIBLE;
+            openPlace(field, x, y);
         else
             field->places[x][y].state = FLAG;
         
@@ -128,7 +151,6 @@ int makeMove(Minefield *field){
             printf("\nGAME OVER!\n");
             return 0;
         }
-        
               
         return 1;
     }
