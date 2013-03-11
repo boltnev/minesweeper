@@ -14,11 +14,18 @@ enum{
   MINE
 };
 
+enum{
+  HIDDEN,
+  VISIBLE,
+  FLAG
+};
+
 typedef struct t_Place Place;
 
 struct t_Place{
     unsigned numberOfMinesNear;
     int mine;
+    int state;
 };
 
 typedef struct t_Minefield Minefield;
@@ -37,6 +44,7 @@ Minefield *initEmptyMinefield(unsigned x, unsigned y){
     for(i = 0; i < x; i++)
         for(j = 0; j < y; j++){
             minefield.places[i][j].mine = EMPTY;
+            minefield.places[i][j].state = HIDDEN;
             minefield.places[i][j].numberOfMinesNear = 0;
         }
     minefield.xSize = x;
@@ -67,10 +75,25 @@ void drawField(Minefield *field){
     int i, j;
     for(i = 0; i < field->xSize; i++){
         for(j = 0; j < field->ySize; j++)
-            if(field->places[i][j].mine)
-              printf("*");
-            else
-              printf("%d", field->places[i][j].numberOfMinesNear);
+            switch(field->places[i][j].state){
+                case VISIBLE:
+                {
+                    if(field->places[i][j].mine)
+                        printf("*");
+                    else
+                       printf("%d", field->places[i][j].numberOfMinesNear);
+                }break;
+               case HIDDEN:
+               {
+                    printf("?");
+                }break;
+                case FLAG:
+                {
+                   printf("F");
+                }break;
+                default:
+                break;
+            }
         printf("\n");
     }
 }
@@ -89,14 +112,39 @@ void placeNumbers(Minefield *field){
     }
 }
 
+/* Simple controls, may be replaced by more advanced */
+int makeMove(Minefield *field){
+    int x, y, action;
+    printf(">> ");
+    scanf("%d %d %d", &x, &y, &action);
+    
+    if(x >= 0 && x < field->xSize && y >= 0 && y < field->ySize){
+        if(action == 1)
+            field->places[x][y].state = VISIBLE;
+        else
+            field->places[x][y].state = FLAG;
+        
+        if(field->places[x][y].state == VISIBLE && field->places[x][y].mine == MINE){
+            printf("\nGAME OVER!\n");
+            return 0;
+        }
+        
+              
+        return 1;
+    }
+    return 0;
+}
+/**/
+
 int play(Minefield *field){
 
     placeNumbers(field);
+    do 
+    {
+        drawField(field); 
+    }while( makeMove(field) );
 
-    drawField(field); 
-    //while(true){
-    //}
-    
+    drawField(field);
     return 0;
 }
 
