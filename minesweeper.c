@@ -77,15 +77,48 @@ int moveWith(Minefield *field, int x, int y, int action){
             openPlace(field, x, y);
         else
             field->places[x][y].state = FLAG;
-        
-        if(field->places[x][y].state == VISIBLE && field->places[x][y].mine == MINE){
-            Gamestate = FAIL;
+       
+        checkGameState(field);
+        if(Gamestate != PLAY)
             return 0;
-        }
-              
-        return 1;
+        else
+            return 1;
     }
     return 0;
+}
+
+void updateMinesPlaces(Minefield *field, int newState){
+    int i, j;
+    for(i = 0; i < field->xSize; i++)
+        for(j = 0; j < field->ySize; j++)
+            if(field->places[i][j].mine == MINE)
+                field->places[i][j].state = newState;
+}
+
+void checkGameState(Minefield *field){
+    int i, j;
+    int countOfVisibles = 0;
+    int xSize = field->xSize;
+    int ySize = field->ySize;
+    for(i = 0; i < xSize; i++){
+        for(j = 0; j < ySize; j++){
+            if(field->places[i][j].state == VISIBLE && field->places[i][j].mine == MINE){
+                Gamestate = FAIL;
+                updateMinesPlaces(field, VISIBLE);
+                return;
+            }
+
+            if(field->places[i][j].state == VISIBLE)
+                countOfVisibles++;
+        }
+    }
+
+
+    if(countOfVisibles == xSize*ySize - field->minesNumber){
+        Gamestate = WIN;
+        updateMinesPlaces(field, FLAG);
+        return;
+    }
 }
 
 /* Simple controls, may be replaced by more advanced */
@@ -116,7 +149,6 @@ int makeFirstMove(Minefield *field){
     }
     
     placeNumbers(field);
-    drawField(field);
         
     return moveWith(field, x, y, action);
 }
@@ -150,6 +182,8 @@ void drawField(Minefield *field){
 /**/
 
 int play(Minefield *field){
+    int startTime = time(NULL);
+    int playTime;
     
     drawField(field);
     makeFirstMove(field);
@@ -160,9 +194,17 @@ int play(Minefield *field){
     };
     if( Gamestate == FAIL )
     {
-        printf("\nGAME OVER!\n");
+        printf("\n*****GAME OVER!*****\n");
         drawField(field);
     }
+    if( Gamestate == WIN )
+    {
+        printf("\n*****YOU WIN!*****\n");
+        drawField(field);
+    }
+    
+    playTime = time(NULL) - startTime;
+    printf("time: %d seconds\n", playTime);
     return 0;
 }
 
