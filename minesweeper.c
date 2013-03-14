@@ -19,9 +19,9 @@ Minefield *initEmptyMinefield(unsigned x, unsigned y){
 Minefield *makeGame(unsigned x, unsigned y, unsigned mines){
     int i, j;  
     Minefield *minefield = initEmptyMinefield(x, y);
-    
+    unsigned minesToPlace = mines;
     srand(time(NULL));
-    while(mines > 0){
+    while(minesToPlace > 0){
       i = rand() % x;
       j = rand() % y;
 
@@ -29,38 +29,13 @@ Minefield *makeGame(unsigned x, unsigned y, unsigned mines){
           continue;
    
       minefield->places[i][j].mine = MINE;
-      mines--;      
+      printf("%d, %d\n", i, j);
+      minesToPlace--;      
     }  
-     
+    minefield->minesNumber = mines;
     return minefield;
 }
 
-void drawField(Minefield *field){
-    int i, j;
-    for(i = 0; i < field->xSize; i++){
-        for(j = 0; j < field->ySize; j++)
-            switch(field->places[i][j].state){
-                case VISIBLE:
-                {
-                     if(field->places[i][j].mine)
-                         printf("*");
-                     else
-                        printf("%d", field->places[i][j].numberOfMinesNear);
-                }break;
-                case HIDDEN:
-                {
-                     printf("?");
-                }break;
-                case FLAG:
-                {
-                     printf("F");
-                }break;
-                default:
-                break;
-            }
-        printf("\n");
-    }
-}
 void increaseNumberOfMilesAround(Minefield *field, int x, int y ){
     int s, t;
     for(s = x - 1; s <= x + 1; s++)
@@ -71,7 +46,6 @@ void increaseNumberOfMilesAround(Minefield *field, int x, int y ){
 }
 
 void placeNumbers(Minefield *field){
-
     int i, j, s, t;
     for(i = 0; i < field->xSize; i++)
         for(j = 0; j < field->ySize; j++)
@@ -80,10 +54,6 @@ void placeNumbers(Minefield *field){
 }
 
 void openNearbyPlaces(Minefield *field, int x, int y){
-    //x - 1, y - 1, 
-    //x - 1 y + 1, 
-    //x + 1, y - 1, 
-    //x + 1, y + 1
     openPlace(field, x - 1, y); 
     openPlace(field, x, y - 1); 
     openPlace(field, x + 1, y ); 
@@ -128,31 +98,68 @@ int makeMove(Minefield *field){
 
 int makeFirstMove(Minefield *field){
 
-    int x, y, action;
+    int x, y;
+    int action;
+    int i, j;
+
     printf(">> ");
     scanf("%d %d %d", &x, &y, &action);
+    srand(time(NULL));
     
-    //if(field->places[x][y].mine == MINE)
+    while(field->places[x][y].mine == MINE){
+        // remove mine
+        field->places[x][y].mine = EMPTY;
+        // place a new mine
+        i = rand() % field->xSize;
+        j = rand() & field->ySize;
+        field->places[i][j].mine = MINE;
+    }
+    
+    placeNumbers(field);
+    drawField(field);
         
     return moveWith(field, x, y, action);
 }
-
+/* Simple view */
+void drawField(Minefield *field){
+    int i, j;
+    for(i = 0; i < field->xSize; i++){
+        for(j = 0; j < field->ySize; j++)
+            switch(field->places[i][j].state){
+                case VISIBLE:
+                {
+                     if(field->places[i][j].mine)
+                         printf("*");
+                     else
+                        printf("%d", field->places[i][j].numberOfMinesNear);
+                }break;
+                case HIDDEN:
+                {
+                     printf("?");
+                }break;
+                case FLAG:
+                {
+                     printf("F");
+                }break;
+                default:
+                break;
+            }
+        printf("\n");
+    }
+}
 /**/
 
 int play(Minefield *field){
-
-    placeNumbers(field);
     
     drawField(field);
     makeFirstMove(field);
-    
-    while( Gamestate == PLAY){
+      
+    while( Gamestate == PLAY ){
         drawField(field); 
         makeMove(field);
     };
     if( Gamestate == FAIL )
     {
-        
         printf("\nGAME OVER!\n");
         drawField(field);
     }

@@ -42,6 +42,7 @@ typedef struct t_Minefield Minefield;
 struct t_Minefield{
     int xSize;
     int ySize;
+    unsigned minesNumber;
     Place places[MAX_X][MAX_Y];
 };
 
