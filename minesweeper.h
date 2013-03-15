@@ -27,8 +27,6 @@ enum{
   PLAY
 };
 
-typedef int gamestate;
-
 typedef struct t_Place Place;
 
 struct t_Place{
@@ -46,10 +44,15 @@ struct t_Minefield{
     Place places[MAX_X][MAX_Y];
 };
 
-gamestate Gamestate = PLAY;
+/* GLOBAL GAME STATE, 
+   change only with following methods */
+void setGameState(int state);
+int getGameState();
 
-Minefield *initEmptyMinefield(unsigned x, unsigned y);
-Minefield *makeGame(unsigned x, unsigned y, unsigned mines);
+int g_gamestate;
+/**/
+void initEmptyMinefield(Minefield *minefield, unsigned x, unsigned y);
+void makeGame(Minefield *minefield, unsigned x, unsigned y, unsigned mines);
 void drawField(Minefield *field);
 void increaseNumberOfMilesAround(Minefield * field, int x, int y);
 void placeNumbers(Minefield *field);

@@ -1,24 +1,21 @@
 #include "minesweeper.h"
 
-Minefield *initEmptyMinefield(unsigned x, unsigned y){
-    Minefield minefield;
-   
+void initEmptyMinefield(Minefield *minefield, unsigned x, unsigned y){
     int i, j;
-    
+
     for(i = 0; i < x; i++)
         for(j = 0; j < y; j++){
-            minefield.places[i][j].mine = EMPTY;
-            minefield.places[i][j].state = HIDDEN;
-            minefield.places[i][j].numberOfMinesNear = 0;
+            minefield->places[i][j].mine = EMPTY;
+            minefield->places[i][j].state = HIDDEN;
+            minefield->places[i][j].numberOfMinesNear = 0;
         }
-    minefield.xSize = x;
-    minefield.ySize = y;
-    return &minefield;
+    minefield->xSize = x;
+    minefield->ySize = y;
 }
 
-Minefield *makeGame(unsigned x, unsigned y, unsigned mines){
+void makeGame(Minefield *minefield, unsigned x, unsigned y, unsigned mines){
     int i, j;  
-    Minefield *minefield = initEmptyMinefield(x, y);
+    initEmptyMinefield(minefield,x, y);
     unsigned minesToPlace = mines;
     srand(time(NULL));
     while(minesToPlace > 0){
@@ -32,7 +29,6 @@ Minefield *makeGame(unsigned x, unsigned y, unsigned mines){
       minesToPlace--;      
     }  
     minefield->minesNumber = mines;
-    return minefield;
 }
 
 void increaseNumberOfMilesAround(Minefield *field, int x, int y ){
@@ -86,7 +82,7 @@ int moveWith(Minefield *field, int x, int y, int action){
         	switch_flag(&field->places[x][y]);
 		}
         checkGameState(field);
-        if(Gamestate != PLAY)
+        if(getGameState() != PLAY)
             return 0;
         else
             return 1;
@@ -110,7 +106,7 @@ void checkGameState(Minefield *field){
     for(i = 0; i < xSize; i++){
         for(j = 0; j < ySize; j++){
             if(field->places[i][j].state == VISIBLE && field->places[i][j].mine == MINE){
-                Gamestate = FAIL;
+                setGameState(FAIL);
                 updateMinesPlaces(field, VISIBLE);
                 return;
             }
@@ -122,7 +118,7 @@ void checkGameState(Minefield *field){
 
 
     if(countOfVisibles == xSize*ySize - field->minesNumber){
-        Gamestate = WIN;
+        setGameState(WIN);
         updateMinesPlaces(field, FLAG);
         return;
     }
@@ -187,24 +183,33 @@ void drawField(Minefield *field){
     }
 }
 /**/
+void setGameState(int state){
+	g_gamestate = state;
+}
+
+int getGameState(){
+	return g_gamestate;	
+}
 
 int play(Minefield *field){
     int startTime = time(NULL);
     int playTime;
     
+	setGameState(PLAY);
+	
     drawField(field);
     makeFirstMove(field);
       
-    while( Gamestate == PLAY ){
+    while( getGameState() == PLAY ){
         drawField(field); 
         makeMove(field);
     };
-    if( Gamestate == FAIL )
+    if( getGameState() == FAIL )
     {
         printf("\n*****GAME OVER!*****\n");
         drawField(field);
     }
-    if( Gamestate == WIN )
+    if( getGameState() == WIN )
     {
         printf("\n*****YOU WIN!*****\n");
         drawField(field);
@@ -217,8 +222,10 @@ int play(Minefield *field){
 
 int main(int argc, char* argv[]){
     if(argc == 1){
-        Minefield *gameField = makeGame(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
-        play(gameField);        
+        Minefield *gameField = malloc(sizeof( Minefield ));
+		makeGame(gameField, DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
+        play(gameField);
+		free(gameField);      
     }
     return 0;
 }
