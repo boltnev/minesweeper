@@ -69,15 +69,22 @@ void openPlace(Minefield *field, int x, int y){
     }
 }
 
+void switch_flag(Place *place){
+	if(place->state == HIDDEN)
+		place->state = FLAG;
+	else
+		place->state = HIDDEN;
+}
+
 int moveWith(Minefield *field, int x, int y, int action){
     if(x >= 0 && x < field->xSize && y >= 0 && y < field->ySize){
         if(action == 1){
             if(field->places[x][y].state != FLAG)
 				openPlace(field, x, y);
 			}
-		else
-            field->places[x][y].state = FLAG;
-       
+		else{
+        	switch_flag(&field->places[x][y]);
+		}
         checkGameState(field);
         if(Gamestate != PLAY)
             return 0;

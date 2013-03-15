@@ -54,6 +54,7 @@ void drawField(Minefield *field);
 void increaseNumberOfMilesAround(Minefield * field, int x, int y);
 void placeNumbers(Minefield *field);
 void openNearbyPlaces(Minefield *field, int x, int y);
+void switch_flag(Place *place);
 void openPlace(Minefield *field, int x, int y);
 void checkGameState(Minefield *field);
 void updateAllMinesPlaces(Minefield *field);
