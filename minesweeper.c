@@ -29,7 +29,6 @@ Minefield *makeGame(unsigned x, unsigned y, unsigned mines){
           continue;
    
       minefield->places[i][j].mine = MINE;
-      printf("%d, %d\n", i, j);
       minesToPlace--;      
     }  
     minefield->minesNumber = mines;
@@ -71,11 +70,12 @@ void openPlace(Minefield *field, int x, int y){
 }
 
 int moveWith(Minefield *field, int x, int y, int action){
-
     if(x >= 0 && x < field->xSize && y >= 0 && y < field->ySize){
-        if(action == 1)
-            openPlace(field, x, y);
-        else
+        if(action == 1){
+            if(field->places[x][y].state != FLAG)
+				openPlace(field, x, y);
+			}
+		else
             field->places[x][y].state = FLAG;
        
         checkGameState(field);
@@ -209,7 +209,6 @@ int play(Minefield *field){
 }
 
 int main(int argc, char* argv[]){
-    
     if(argc == 1){
         Minefield *gameField = makeGame(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
         play(gameField);        
