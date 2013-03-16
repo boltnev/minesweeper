@@ -4,9 +4,9 @@
 #define DEFAULT_X 10
 #define DEFAULT_Y 10
 #define DEFAULT_MINES 10
-#define MAX_X     500
-#define MAX_Y     500
-#define MAX_MINES 20000
+#define MAX_X     100
+#define MAX_Y     100
+#define MAX_MINES 5000
 
 //Place holds:
 enum{

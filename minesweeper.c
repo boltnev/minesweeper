@@ -224,7 +224,7 @@ int main(int argc, char* argv[]){
     if(argc == 1){
         Minefield *gameField = malloc(sizeof( Minefield ));
 		makeGame(gameField, DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
-        play(gameField);
+		play(gameField);
 		free(gameField);      
     }
     return 0;
