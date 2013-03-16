@@ -68,7 +68,7 @@ void openPlace(Minefield *field, int x, int y){
 void switch_flag(Place *place){
 	if(place->state == HIDDEN)
 		place->state = FLAG;
-	else
+	else if (place->state == FLAG)
 		place->state = HIDDEN;
 }
 
@@ -192,8 +192,8 @@ int getGameState(){
 }
 
 int play(Minefield *field){
-    int startTime = time(NULL);
-    int playTime;
+    double startTime = time(NULL);
+    double playTime;
     
 	setGameState(PLAY);
 	
@@ -216,7 +216,7 @@ int play(Minefield *field){
     }
     
     playTime = time(NULL) - startTime;
-    printf("time: %d seconds\n", playTime);
+    printf("time: %f seconds\n", playTime);
     return 0;
 }
 
